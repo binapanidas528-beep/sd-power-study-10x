@@ -1112,6 +1112,135 @@ Provide:
       let streak = parseInt(localStorage.getItem('study_streak') || "5");
       document.getElementById('streakCounter').innerText = streak;
     }
+    <script>
+  // Cloudflare Worker Backend URL
+  const BACKEND_URL = "https://lingering-sky-5e8f.binapanidas528.workers.dev/";
+
+  // Mode Switcher Function
+  function switchMode(modeId) {
+    document.querySelectorAll('.mode-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(el => {
+      el.classList.remove('bg-brand-600', 'text-white', 'shadow-md');
+      el.classList.add('text-slate-300');
+    });
+
+    const selectedTab = document.getElementById('tab-' + modeId);
+    const selectedContent = document.getElementById(modeId);
+
+    if (selectedContent) selectedContent.classList.remove('hidden');
+    if (selectedTab) {
+      selectedTab.classList.add('bg-brand-600', 'text-white', 'shadow-md');
+      selectedTab.classList.remove('text-slate-300');
+    }
+  }
+
+  // Quick Subject Selection
+  function setSubject(subjectName) {
+    document.getElementById('examSubject').value = subjectName;
+  }
+
+  // File Upload Handler (Optional PDF / Text)
+  let uploadedFileContent = "";
+  function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    document.getElementById('fileNameDisplay').innerText = file.name;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      uploadedFileContent = e.target.result;
+    };
+    if (file.type === "application/pdf") {
+      // PDF text extraction using PDF.js
+      const fileReader = new FileReader();
+      fileReader.onload = function() {
+        const typedarray = new Uint8Array(this.result);
+        pdfjsLib.getDocument(typedarray).promise.then(pdf => {
+          let textPromises = [];
+          for (let i = 1; i <= pdf.numPages; i++) {
+            textPromises.push(pdf.getPage(i).then(page => page.getTextContent().then(tc => {
+              return tc.items.map(s => s.str).join(" ");
+            })));
+          }
+          Promise.all(textPromises).then(texts => {
+            uploadedFileContent = texts.join("\n");
+          });
+        });
+      };
+      fileReader.readAsArrayBuffer(file);
+    } else {
+      reader.readAsText(file);
+    }
+  }
+
+  // Main Generator Call Function
+  async function generateExamPaper(e) {
+    if (e) e.preventDefault();
+
+    const level = document.getElementById('examLevel').value;
+    const language = document.getElementById('examLanguage').value;
+    const subject = document.getElementById('examSubject').value;
+    const topic = document.getElementById('examTopic').value;
+    const numMcq = document.getElementById('numMcq').value;
+    const numShort = document.getElementById('numShort').value;
+    const numLong = document.getElementById('numLong').value;
+    const difficulty = document.getElementById('difficultyLevel').value;
+
+    const generateBtn = document.getElementById('generateBtn');
+    const outputContainer = document.getElementById('outputContainer');
+
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Generating Exam Paper...`;
+
+    const prompt = `Create a complete question paper with a detailed answer key.
+Level: ${level}
+Language: ${language}
+Subject: ${subject}
+Specific Topic: ${topic || 'Comprehensive Syllabus'}
+Difficulty: ${difficulty}
+Structure required:
+- ${numMcq} MCQs (1 mark each with 4 options and correct answer explanation)
+- ${numShort} Short Answer Questions (2-3 marks each with sample answers)
+- ${numLong} Long/Analytical Questions (5-10 marks each with step-by-step key solutions)
+${uploadedFileContent ? 'Use the following context from uploaded document: ' + uploadedFileContent.substring(0, 2000) : ''}`;
+
+    try {
+      const response = await fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: prompt })
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        alert("Error: " + data.error);
+      } else {
+        outputContainer.classList.remove('hidden');
+        document.getElementById('outputTitle').innerText = `Exam Question Paper & Solution Key (${subject} - ${level})`;
+        document.getElementById('outputContent').innerHTML = marked.parse(data.text);
+        outputContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+    } catch (err) {
+      alert("Failed to connect to backend worker: " + err.message);
+    } finally {
+      generateBtn.disabled = false;
+      generateBtn.innerHTML = `<i class="fa-solid fa-rocket"></i> <span>Generate Exam Paper & Solutions</span>`;
+    }
+  }
+
+  // Helper Copy Function
+  function copyOutput() {
+    const text = document.getElementById('outputContent').innerText;
+    navigator.clipboard.writeText(text);
+    alert("Output copied to clipboard!");
+  }
+
+  // Helper Print/Export Function
+  function printOutput() {
+    window.print();
+  }
+</script>
   </script>
 </body>
 </html>
