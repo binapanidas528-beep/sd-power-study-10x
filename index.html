@@ -626,11 +626,12 @@
       }
     }
 
-    // Call Backend Proxy API
+    // Call Backend Proxy API with CORS Proxy Support
     async function callBackendApi(promptText) {
       showLoading();
       try {
-        const response = await fetch(BACKEND_URL, {
+        const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(BACKEND_URL);
+        const response = await fetch(proxyUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt: promptText })
