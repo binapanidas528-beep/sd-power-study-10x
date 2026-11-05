@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>shradha विद्या Smart Study & Research Companion</title>
+  <title>sd study 10x - Smart Study & Research Companion</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -124,7 +124,7 @@
       </div>
       <div>
         <h1 class="text-xl lg:text-2xl font-extrabold tracking-tight leading-none">
-          shradha <span class="gradient-text">विद्या Smart Study 10x</span>
+          <span class="gradient-text">sd study 10x</span>
         </h1>
         <p class="text-[11px] text-slate-400 font-medium">Smart Study & Research Companion (Class 8 – PhD)</p>
       </div>
@@ -539,307 +539,273 @@
         </div>
       </div>
 
-      <!-- Rendered Markdown Content Box -->
-      <div id="outputContent" class="prose prose-invert max-w-none text-slate-200 leading-relaxed space-y-4 text-sm sm:text-base">
-        <!-- AI output will load here -->
-      </div>
+      <div id="outputBody" class="prose prose-invert max-w-none text-slate-200 text-sm leading-relaxed overflow-x-auto p-2"></div>
     </div>
 
   </main>
 
-  <!-- Notification Toast Box -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-800 text-white px-4 py-3 rounded-xl border border-slate-700 shadow-2xl flex items-center space-x-2 text-xs font-semibold">
-    <i class="fa-solid fa-circle-check text-emerald-400 text-base" id="toastIcon"></i>
-    <span id="toastMsg">Action completed successfully</span>
-  </div>
-
-  <!-- JAVASCRIPT INTEGRATION LOGIC -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // Cloudflare Worker Live Backend Endpoint
-    const BACKEND_URL = "https://lingering-sky-5e8f.binapanidas528.workers.dev/";
+    // BACKEND API ENDPOINT (GOOGLE APPS SCRIPT PROXY)
+    const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyR1jmq-QZiGpzHSPavGrbCVvnatx5vBBuPcgdyFVtwAFa1CncV8I2JhJgNCVuVa8B/exec";
 
-    // Switch Nav Tabs
+    let pdfExtractedText = "";
+    let summaryPdfText = "";
+    let timerInterval = null;
+    let timerSeconds = 25 * 60;
+
+    // Switch Application Tabs
     function switchMode(modeId) {
       document.querySelectorAll('.mode-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(el => {
-        el.classList.remove('bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-600/30', 'font-semibold');
-        el.classList.add('text-slate-300');
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-600', 'text-white', 'font-semibold', 'shadow-md');
+        btn.classList.add('text-slate-300');
       });
 
-      const selectedTab = document.getElementById('tab-' + modeId);
-      const selectedContent = document.getElementById(modeId);
-
-      if (selectedContent) selectedContent.classList.remove('hidden');
-      if (selectedTab) {
-        selectedTab.classList.add('bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-600/30', 'font-semibold');
-        selectedTab.classList.remove('text-slate-300');
+      document.getElementById(modeId).classList.remove('hidden');
+      const activeTab = document.getElementById('tab-' + modeId);
+      if (activeTab) {
+        activeTab.classList.add('bg-brand-600', 'text-white', 'font-semibold', 'shadow-md');
+        activeTab.classList.remove('text-slate-300');
       }
     }
 
-    // Set Subject from quick bar
-    function setSubject(subjectName) {
-      document.getElementById('examSubject').value = subjectName;
+    // Set Quick Subject Name
+    function setSubject(name) {
+      document.getElementById('examSubject').value = name;
     }
 
-    // Randomize topics helper
-    function randomizeInputs() {
-      const subjects = ['Physics', 'Computer Science', 'Mathematics', 'Chemistry', 'Research Methodology', 'History', 'Political Science'];
-      const topics = ['Quantum Mechanics', 'Data Structures & Algorithms', 'Calculus & Integration', 'Organic Reactions', 'Literature Review Methods', 'Modern World History'];
-      const randomSub = subjects[Math.floor(Math.random() * subjects.length)];
-      const randomTop = topics[Math.floor(Math.random() * topics.length)];
-
-      document.getElementById('examSubject').value = randomSub;
-      document.getElementById('examTopic').value = randomTop;
-      showToast('Randomized topic to: ' + randomSub);
-    }
-
-    // PDF extraction for Exam Paper
-    let uploadedFileContent = "";
-    function handleFileSelect(event) {
-      const file = event.target.files[0];
+    // Handle File Upload & Extract PDF Content
+    async function handleFileSelect(e) {
+      const file = e.target.files[0];
       if (!file) return;
-      document.getElementById('fileNameDisplay').innerText = file.name;
+      document.getElementById('fileNameDisplay').textContent = file.name;
 
       if (file.type === "application/pdf") {
-        const fileReader = new FileReader();
-        fileReader.onload = function() {
-          const typedarray = new Uint8Array(this.result);
-          pdfjsLib.getDocument(typedarray).promise.then(pdf => {
-            let textPromises = [];
-            for (let i = 1; i <= pdf.numPages; i++) {
-              textPromises.push(pdf.getPage(i).then(page => page.getTextContent().then(tc => {
-                return tc.items.map(s => s.str).join(" ");
-              })));
-            }
-            Promise.all(textPromises).then(texts => {
-              uploadedFileContent = texts.join("\n");
-              showToast('PDF loaded successfully!');
-            });
-          });
-        };
-        fileReader.readAsArrayBuffer(file);
+        pdfExtractedText = await extractPdfText(file);
       } else {
         const reader = new FileReader();
-        reader.onload = function(e) {
-          uploadedFileContent = e.target.result;
-          showToast('File loaded!');
+        reader.onload = (event) => { pdfExtractedText = event.target.result; };
+        reader.readAsText(file);
+      }
+    }
+
+    async function handleSummaryPdfSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById('summaryFileName').textContent = file.name;
+
+      if (file.type === "application/pdf") {
+        summaryPdfText = await extractPdfText(file);
+        document.getElementById('summaryText').value = summaryPdfText.substring(0, 5000);
+      } else {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          summaryPdfText = event.target.result;
+          document.getElementById('summaryText').value = summaryPdfText.substring(0, 5000);
         };
         reader.readAsText(file);
       }
     }
 
-    // PDF extraction for Summarizer
-    let summaryPdfText = "";
-    function handleSummaryPdfSelect(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      document.getElementById('summaryFileName').innerText = file.name;
-
-      const fileReader = new FileReader();
-      fileReader.onload = function() {
-        const typedarray = new Uint8Array(this.result);
-        pdfjsLib.getDocument(typedarray).promise.then(pdf => {
-          let textPromises = [];
-          for (let i = 1; i <= pdf.numPages; i++) {
-            textPromises.push(pdf.getPage(i).then(page => page.getTextContent().then(tc => {
-              return tc.items.map(s => s.str).join(" ");
-            })));
-          }
-          Promise.all(textPromises).then(texts => {
-            summaryPdfText = texts.join("\n");
-            document.getElementById('summaryText').value = summaryPdfText.substring(0, 3000) + "...";
-            showToast('PDF extracted to text area!');
-          });
-        });
-      };
-      fileReader.readAsArrayBuffer(file);
+    // Extract text from PDF using PDF.js
+    async function extractPdfText(file) {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let text = "";
+        for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          text += content.items.map(item => item.str).join(" ") + "\n";
+        }
+        return text;
+      } catch (err) {
+        alert("Error reading PDF file: " + err.message);
+        return "";
+      }
     }
 
-    // Backend Request Dispatcher
-    async function callBackendAI(promptText, btnId, btnOriginalHtml, titleText) {
-      const btn = document.getElementById(btnId);
-      const outputContainer = document.getElementById('outputContainer');
-      const outputContent = document.getElementById('outputContent');
-      const outputTitle = document.getElementById('outputTitle');
-
-      btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Processing...`;
-
+    // Call Backend Proxy API
+    async function callBackendApi(promptText) {
+      showLoading();
       try {
         const response = await fetch(BACKEND_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt: promptText })
         });
-
         const data = await response.json();
-
+        
         if (data.error) {
-          alert("API Error: " + data.error);
-        } else {
-          outputContainer.classList.remove('hidden');
-          outputTitle.innerText = titleText;
-          outputContent.innerHTML = marked.parse(data.text);
-          outputContainer.scrollIntoView({ behavior: 'smooth' });
-          showToast('Generated successfully!');
+          throw new Error(data.error);
         }
+        return data.text;
       } catch (err) {
-        alert("Failed to connect to backend: " + err.message);
+        alert("Error connecting to server: " + err.message);
+        return null;
       } finally {
-        btn.disabled = false;
-        btn.innerHTML = btnOriginalHtml;
+        hideLoading();
       }
     }
 
-    // 1. Generate Exam Paper Function
+    // 1. Generate Exam Paper
     async function generateExamPaper() {
       const level = document.getElementById('examLevel').value;
-      const language = document.getElementById('examLanguage').value;
+      const lang = document.getElementById('examLanguage').value;
       const subject = document.getElementById('examSubject').value;
       const topic = document.getElementById('examTopic').value;
-      const numMcq = document.getElementById('numMcq').value;
-      const numShort = document.getElementById('numShort').value;
-      const numLong = document.getElementById('numLong').value;
-      const difficulty = document.getElementById('difficultyLevel').value;
+      const mcq = document.getElementById('numMcq').value;
+      const shortQ = document.getElementById('numShort').value;
+      const longQ = document.getElementById('numLong').value;
+      const diff = document.getElementById('difficultyLevel').value;
 
-      if (!subject) {
-        alert('Please enter a subject name.');
-        return;
-      }
+      let prompt = `Act as an expert Academic Examiner and Question Paper Setter for ${level}.
+Create a complete Examination Question Paper along with Detailed Answers & Solutions.
 
-      const prompt = `Act as an expert professor and create an official exam paper with a detailed solution key.
-Academic Level: ${level}
-Language: ${language}
 Subject: ${subject}
-Topic/Chapter: ${topic || 'Complete Syllabus'}
-Difficulty: ${difficulty}
+Topic: ${topic || 'General Core Syllabus'}
+Language: ${lang}
+Difficulty: ${diff}
 
-Required Section Structure:
-1. Section A: ${numMcq} Multiple Choice Questions (1 Mark each, with options A,B,C,D and Answer key with explanations).
-2. Section B: ${numShort} Short Answer Questions (2-3 Marks each, with complete sample answers).
-3. Section C: ${numLong} Long / Analytical Questions (5-10 Marks each, with step-by-step detailed model solutions).
+Include:
+- ${mcq} Multiple Choice Questions (1 Mark each) with options A, B, C, D and Answer Keys with Explanation.
+- ${shortQ} Short Answer Questions (2-3 Marks each) with complete step-by-step solutions.
+- ${longQ} Long Answer / Analytical Questions (5-10 Marks each) with thorough step-by-step breakdown.`;
 
-${uploadedFileContent ? 'Integrate concepts from uploaded reference material: ' + uploadedFileContent.substring(0, 3000) : ''}`;
+      if (pdfExtractedText) {
+        prompt += `\n\nUse this provided reference material text for generating questions:\n` + pdfExtractedText.substring(0, 3000);
+      }
 
-      const origHtml = `<i class="fa-solid fa-rocket"></i> <span>Generate Exam Paper & Solutions</span>`;
-      await callBackendAI(prompt, 'generateBtn', origHtml, `Exam Question Paper & Solution Key (${subject} - ${level})`);
+      const result = await callBackendApi(prompt);
+      if (result) displayOutput("Exam Paper & Complete Solutions", result);
     }
 
-    // 2. Solve Deep Q&A & Meaning
+    // 2. Solve Detailed Meaning
     async function solveDetailedQuery() {
-      const level = document.getElementById('meaningLevel').value;
-      const language = document.getElementById('meaningLanguage').value;
-      const depth = document.getElementById('meaningDepth').value;
       const query = document.getElementById('meaningQuery').value;
+      const level = document.getElementById('meaningLevel').value;
+      const lang = document.getElementById('meaningLanguage').value;
+      const depth = document.getElementById('meaningDepth').value;
 
-      if (!query) {
-        alert('Please enter a word, concept, or question.');
-        return;
-      }
+      if (!query.trim()) { alert("Please enter a question or term!"); return; }
 
-      const prompt = `Provide a comprehensive academic breakdown for: "${query}".
-Level: ${level}
-Language: ${language}
-Detail Depth: ${depth}
+      const prompt = `Provide a comprehensive academic breakdown for: "${query}"
+Academic Level: ${level}
+Language: ${lang}
+Depth Style: ${depth}
 
-Format with:
-- Standard Definition & Etymology
-- Core Academic Concept Explanation
-- Real-world Examples & Case Studies
-- Key Formulas/Diagram explanations (if applicable)
-- Synonyms, Antonyms, or Related Academic Terms
-- Exam/Thesis Importance Points`;
+Format with clear headers:
+1. Definition & Core Meaning
+2. Detailed Explanation & Context
+3. Real-World Practical Examples
+4. Important Examination / Academic Points
+5. Key Synonyms & Related Academic Concepts`;
 
-      const origHtml = `<i class="fa-solid fa-file-invoice"></i> <span>Get Full Detailed Explanation & Meaning</span>`;
-      await callBackendAI(prompt, 'solveMeaningBtn', origHtml, `Detailed Explanation: ${query}`);
+      const result = await callBackendApi(prompt);
+      if (result) displayOutput("Detailed Concept & Meaning Analysis", result);
     }
 
-    // 3. Solve Doubt Function
+    // 3. Solve Instant Doubt
     async function solveDoubt() {
-      const language = document.getElementById('doubtLanguage').value;
-      const style = document.getElementById('doubtStyle').value;
       const doubt = document.getElementById('doubtPrompt').value;
+      const lang = document.getElementById('doubtLanguage').value;
+      const style = document.getElementById('doubtStyle').value;
 
-      if (!doubt) {
-        alert('Please enter your doubt or question.');
-        return;
-      }
+      if (!doubt.trim()) { alert("Please enter your doubt!"); return; }
 
-      const prompt = `Solve this academic doubt clearly:
-Doubt: "${doubt}"
-Language Style: ${language}
+      const prompt = `Explain and solve this academic doubt clearly:
+"${doubt}"
+
+Language: ${lang}
 Explanation Style: ${style}
 
-Structure response with:
-1. Direct Simple Answer
-2. Step-by-Step Explanation
-3. Example or Memory Trick
-4. Quick Summary Note`;
+Structure the response with simple language, step-by-step logic, clear mathematical or conceptual breakdown, and a final summary.`;
 
-      const origHtml = `<i class="fa-solid fa-bolt"></i> <span>Solve Doubt Instantly</span>`;
-      await callBackendAI(prompt, 'solveDoubtBtn', origHtml, `AI Doubt Resolution`);
+      const result = await callBackendApi(prompt);
+      if (result) displayOutput("AI Instant Doubt Resolution", result);
     }
 
-    // 4. Summarize Paper Function
+    // 4. Summarize Research Paper
     async function summarizePaper() {
       const text = document.getElementById('summaryText').value;
-      if (!text) {
-        alert('Please paste text or upload a PDF to summarize.');
-        return;
-      }
+      if (!text.trim()) { alert("Please paste text or upload a PDF first!"); return; }
 
-      const prompt = `Provide an executive research summary of the following content:
-${text.substring(0, 4000)}
+      const prompt = `Perform a high-level academic summary and critical extraction of this research content:
+"${text.substring(0, 4000)}"
 
-Structure required:
-- Executive Summary (3-4 sentences)
-- Core Research Questions / Objectives
-- Methodology & Approach
-- Key Findings & Results
-- Critical Conclusions & Future Scope`;
+Extract and format clearly:
+1. Key Abstract & Core Thesis Statement
+2. Methodology / Approach Used
+3. Major Research Findings & Results
+4. Practical Implications & Conclusion`;
 
-      const origHtml = `<i class="fa-solid fa-compress-wide"></i> <span>Extract Key Summary & Findings</span>`;
-      await callBackendAI(prompt, 'summaryBtn', origHtml, `Research & Text Summary`);
+      const result = await callBackendApi(prompt);
+      if (result) displayOutput("Research Summary & Key Findings", result);
     }
 
-    // 5. Generate Citation Function
+    // 5. Generate Citation
     async function generateCitation() {
+      const info = document.getElementById('citationInput').value;
       const style = document.getElementById('citationStyle').value;
-      const type = document.getElementById('sourceType').value;
-      const input = document.getElementById('citationInput').value;
+      const source = document.getElementById('sourceType').value;
 
-      if (!input) {
-        alert('Please enter details of the source.');
-        return;
-      }
+      if (!info.trim()) { alert("Please enter source details!"); return; }
 
-      const prompt = `Format the following metadata into a precise academic citation.
-Citation Style: ${style}
-Source Type: ${type}
-Details: "${input}"
+      const prompt = `Format the following source details into a precise ${style} reference citation.
+Source Type: ${source}
+Details: "${info}"
 
 Provide:
-1. In-text Citation format
-2. Full Bibliography / Reference entry format
-3. Annotated summary note (1 line)`;
+1. Full Bibliographic Reference (Formatted in Markdown)
+2. In-Text Citation Example (e.g. Smith, 2024)`;
 
-      const origHtml = `<i class="fa-solid fa-quote-left"></i> <span>Format Citation & Reference</span>`;
-      await callBackendAI(prompt, 'citationBtn', origHtml, `Formatted Citation (${style})`);
+      const result = await callBackendApi(prompt);
+      if (result) displayOutput("Formatted Academic Citation", result);
+    }
+
+    // Randomize Topics for Practice
+    function randomizeInputs() {
+      const topics = ["Quantum Mechanics & Wave Equations", "Thermodynamics & Heat Transfer", "Machine Learning & Neural Networks", "Research Methodology & Hypothesis Testing", "Organic Reaction Mechanisms", "Macroeconomic Policy & Inflation"];
+      const randTopic = topics[Math.floor(Math.random() * topics.length)];
+      document.getElementById('examTopic').value = randTopic;
+    }
+
+    // UI Helper Functions
+    function showLoading() {
+      const container = document.getElementById('outputContainer');
+      container.classList.remove('hidden');
+      document.getElementById('outputTitle').textContent = "Processing Request...";
+      document.getElementById('outputBody').innerHTML = `<div class="flex items-center justify-center py-12 space-x-3 text-indigo-400">
+        <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
+        <span class="text-sm font-semibold">Generating high-quality response...</span>
+      </div>`;
+      container.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function hideLoading() {}
+
+    function displayOutput(title, markdownText) {
+      const container = document.getElementById('outputContainer');
+      container.classList.remove('hidden');
+      document.getElementById('outputTitle').textContent = title;
+      document.getElementById('outputBody').innerHTML = marked.parse(markdownText);
+    }
+
+    function copyOutput() {
+      const text = document.getElementById('outputBody').innerText;
+      navigator.clipboard.writeText(text);
+      alert("Text copied to clipboard!");
+    }
+
+    function printOutput() {
+      window.print();
     }
 
     // Pomodoro Timer Logic
-    let timerInterval = null;
-    let timerSeconds = 25 * 60;
-
-    function updateTimerDisplay() {
-      const mins = Math.floor(timerSeconds / 60);
-      const secs = timerSeconds % 60;
-      document.getElementById('timerDisplay').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-
     function startTimer() {
       if (timerInterval) return;
-      document.getElementById('timerStatus').innerText = "Session Running";
+      document.getElementById('timerStatus').textContent = "Focusing...";
       timerInterval = setInterval(() => {
         if (timerSeconds > 0) {
           timerSeconds--;
@@ -847,56 +813,36 @@ Provide:
         } else {
           clearInterval(timerInterval);
           timerInterval = null;
-          document.getElementById('timerStatus').innerText = "Session Complete!";
-          showToast('Focus session complete! Take a break.');
+          alert("Session completed! Take a break.");
         }
       }, 1000);
     }
 
     function pauseTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-        document.getElementById('timerStatus').innerText = "Session Paused";
-      }
+      clearInterval(timerInterval);
+      timerInterval = null;
+      document.getElementById('timerStatus').textContent = "Paused";
     }
 
     function resetTimer() {
       pauseTimer();
       timerSeconds = 25 * 60;
       updateTimerDisplay();
-      document.getElementById('timerStatus').innerText = "Focus Session";
+      document.getElementById('timerStatus').textContent = "Focus Session";
     }
 
     function setTimerDuration(mins) {
       pauseTimer();
       timerSeconds = mins * 60;
       updateTimerDisplay();
-      document.getElementById('timerStatus').innerText = mins === 5 ? "Break Time" : "Focus Session";
+      document.getElementById('timerStatus').textContent = mins === 5 ? "Break Time" : "Focus Session";
     }
 
-    // Copy Output to Clipboard
-    function copyOutput() {
-      const text = document.getElementById('outputContent').innerText;
-      navigator.clipboard.writeText(text);
-      showToast('Copied to clipboard!');
-    }
-
-    // Print / Export PDF
-    function printOutput() {
-      window.print();
-    }
-
-    // Toast Notification Utility
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      document.getElementById('toastMsg').innerText = message;
-      toast.classList.remove('translate-y-20', 'opacity-0');
-      toast.classList.add('translate-y-0', 'opacity-100');
-      setTimeout(() => {
-        toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('translate-y-20', 'opacity-0');
-      }, 3000);
+    function updateTimerDisplay() {
+      const mins = Math.floor(timerSeconds / 60);
+      const secs = timerSeconds % 60;
+      document.getElementById('timerDisplay').textContent = 
+        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
   </script>
 </body>
