@@ -626,45 +626,16 @@
       }
     }
 
-    // Call Backend Proxy API with AllOrigins CORS Proxy Support
-   // Call Backend Proxy API with ThingProxy Support
+    // Call Backend Proxy API with CORS Proxy Support
     async function callBackendApi(promptText) {
       showLoading();
       try {
-        const proxyUrl = "https://thingproxy.freeboard.io/fetch/" + BACKEND_URL;
+        const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(BACKEND_URL);
         const response = await fetch(proxyUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt: promptText })
         });
-        const data = await response.json();
-        
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        return data.text;
-      } catch (err) {
-        alert("Error connecting to server: " + err.message);
-        return null;
-      } finally {
-        hideLoading();
-      }
-    }
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        return data.text;
-      } catch (err) {
-        alert("Error connecting to server: " + err.message);
-        return null;
-      } finally {
-        hideLoading();
-      }
-    }
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptText })
-      });
         const data = await response.json();
         
         if (data.error) {
