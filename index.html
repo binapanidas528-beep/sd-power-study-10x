@@ -630,12 +630,11 @@
     async function callBackendApi(promptText) {
       showLoading();
       try {
-        const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(BACKEND_URL);
-        const response = await fetch(proxyUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: promptText })
-        });
+        const response = await fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: promptText })
+      });
         const data = await response.json();
         
         if (data.error) {
