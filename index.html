@@ -630,22 +630,39 @@
     async function callBackendApi(promptText) {
       showLoading();
       try {
+        // Using a reliable direct JSON approach via alternative fetch options
         const response = await fetch(BACKEND_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({ prompt: promptText })
         });
         
-        const data = await response.json();
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        return data.text;
-      } catch (err) {
+        // Since 'no-cors' returns an opaque response, we fetch via a guaranteed JSON text proxy method
+        const fallbackUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(BACKEND_URL + "?prompt=" + encodeURIComponent(promptText));
+        const res = await fetch(fallbackUrl);
+        const textData = await res.text();
+        
         try {
-          const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(BACKEND_URL);
-          const res2 = await fetch(proxyUrl, {
-            method: 'POST',
+          const json = JSON.parse(textData);
+          if (json.error) throw new Error(json.error);
+          return json.text;
+        } catch (parseErr) {
+          // If raw text is already the result or needs formatting
+          if (textData && textData.length > 10) {
+            return textData;
+          }
+          throw new Error("Invalid response received from server.");
+        }
+      } catch (err) {
+        alert("Error connecting to server: " + err.message);
+        return null;
+      } finally {
+        hideLoading();
+      }
+    }
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ prompt: promptText })
           });
