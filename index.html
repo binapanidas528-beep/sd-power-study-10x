@@ -626,18 +626,15 @@
       }
     }
 
-    // Call Backend Proxy API with CORS Proxy Support
+    // Call Backend Proxy API with AllOrigins GET & JSON Parsing Support
     async function callBackendApi(promptText) {
       showLoading();
       try {
-        const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(BACKEND_URL);
-        const response = await fetch(proxyUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: promptText })
-        });
-        const data = await response.json();
-        
+        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(BACKEND_URL + "?prompt=" + encodeURIComponent(promptText));
+        const proxyRes = await fetch(proxyUrl);
+        const wrapper = await proxyRes.json();
+        const data = JSON.parse(wrapper.contents);
+
         if (data.error) {
           throw new Error(data.error);
         }
