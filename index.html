@@ -630,21 +630,36 @@
     async function callBackendApi(promptText) {
       showLoading();
       try {
-        const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(BACKEND_URL + "?prompt=" + encodeURIComponent(promptText));
-        const proxyRes = await fetch(proxyUrl);
-        const wrapper = await proxyRes.json();
-        const data = JSON.parse(wrapper.contents);
-
+        const response = await fetch(BACKEND_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ prompt: promptText })
+        });
+        
+        const data = await response.json();
         if (data.error) {
           throw new Error(data.error);
         }
         return data.text;
       } catch (err) {
-        alert("Error connecting to server: " + err.message);
-        return null;
+        try {
+          const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(BACKEND_URL);
+          const res2 = await fetch(proxyUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: promptText })
+          });
+          const data2 = await res2.json();
+          if (data2.error) throw new Error(data2.error);
+          return data2.text;
+        } catch (innerErr) {
+          alert("Error connecting to server: " + innerErr.message);
+          return null;
+        }
       } finally {
         hideLoading();
       }
+    }
     }
 
     // 1. Generate Exam Paper
