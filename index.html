@@ -630,7 +630,7 @@
     async function callBackendApi(promptText) {
       showLoading();
       try {
-        const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(BACKEND_URL);
+        const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(BACKEND_URL);
         const response = await fetch(proxyUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
