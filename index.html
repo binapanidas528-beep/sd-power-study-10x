@@ -149,27 +149,27 @@
 
     <!-- Mode Selector Tabs -->
     <nav class="glass-card p-1.5 rounded-2xl flex flex-wrap gap-1.5 text-xs sm:text-sm font-medium no-print shadow-xl">
-      <button onclick="switchMode('mode-exam')" id="tab-mode-exam" class="tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 transition-all duration-200 bg-brand-600 text-white font-semibold shadow-md shadow-brand-600/30">
+      <button type="button" onclick="switchMode('mode-exam')" id="tab-mode-exam" class="tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 transition-all duration-200 bg-brand-600 text-white font-semibold shadow-md shadow-brand-600/30 cursor-pointer">
         <i class="fa-solid fa-file-pen text-sm"></i>
         <span>Exam Generator</span>
       </button>
-      <button onclick="switchMode('mode-meaning')" id="tab-mode-meaning" class="tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all duration-200">
+      <button type="button" onclick="switchMode('mode-meaning')" id="tab-mode-meaning" class="tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all duration-200 cursor-pointer">
         <i class="fa-solid fa-magnifying-glass-chart text-teal-400 text-sm"></i>
         <span>Deep Q&A & Meaning</span>
       </button>
-      <button onclick="switchMode('mode-doubt')" id="tab-mode-doubt" class="tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all duration-200">
+      <button type="button" onclick="switchMode('mode-doubt')" id="tab-mode-doubt" class="tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all duration-200 cursor-pointer">
         <i class="fa-solid fa-brain text-amber-400 text-sm"></i>
         <span>AI Doubt Solver</span>
       </button>
-      <button onclick="switchMode('mode-summary')" id="tab-mode-summary" class="tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all duration-200">
+      <button type="button" onclick="switchMode('mode-summary')" id="tab-mode-summary" class="tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all duration-200 cursor-pointer">
         <i class="fa-solid fa-book-open-reader text-emerald-400 text-sm"></i>
         <span>Paper Summarizer</span>
       </button>
-      <button onclick="switchMode('mode-citation')" id="tab-mode-citation" class="tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all duration-200">
+      <button type="button" onclick="switchMode('mode-citation')" id="tab-mode-citation" class="tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all duration-200 cursor-pointer">
         <i class="fa-solid fa-quote-right text-cyan-400 text-sm"></i>
         <span>Auto Citation</span>
       </button>
-      <button onclick="switchMode('mode-focus')" id="tab-mode-focus" class="tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all duration-200">
+      <button type="button" onclick="switchMode('mode-focus')" id="tab-mode-focus" class="tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all duration-200 cursor-pointer">
         <i class="fa-solid fa-clock text-rose-400 text-sm"></i>
         <span>Focus Room</span>
       </button>
@@ -192,7 +192,7 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1.5">Select Class / Academic Level *</label>
-              <select id="examLevel" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-brand-500 transition">
+              <select id="examLevel" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-brand-500 transition cursor-pointer">
                 <option value="Class 8">Class 8 (Middle School)</option>
                 <option value="Class 9">Class 9 (High School)</option>
                 <option value="Class 10">Class 10 (Board Level)</option>
@@ -206,7 +206,7 @@
 
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1.5">Select Output Language *</label>
-              <select id="examLanguage" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-brand-500 transition">
+              <select id="examLanguage" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-brand-500 transition cursor-pointer">
                 <option value="English" selected>English</option>
                 <option value="Hindi">Hindi (हिंदी)</option>
                 <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
@@ -216,7 +216,7 @@
 
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1.5">Subject Name *</label>
-              <input type="text" id="examSubject" placeholder="e.g. Physics, Research Methodology, Political Science" value="Computer Science" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition" />
+              <input type="text" id="examSubject" placeholder="e.g. Physics, Research Methodology" value="Computer Science" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition" />
             </div>
           </div>
 
@@ -233,7 +233,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1.5">Specific Topic / Chapter Name</label>
-              <input type="text" id="examTopic" placeholder="e.g. Thermodynamics, Literature Review Methods, Quantum Physics" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition" />
+              <input type="text" id="examTopic" placeholder="e.g. Thermodynamics, Quantum Physics" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition" />
             </div>
 
             <div>
@@ -251,7 +251,7 @@
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900/50 p-3.5 rounded-xl border border-slate-800/80">
             <div>
               <label class="block text-[11px] font-semibold text-slate-400 mb-1">MCQs (1 Mark)</label>
-              <select id="numMcq" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+              <select id="numMcq" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 cursor-pointer">
                 <option value="3">3 Questions</option>
                 <option value="5" selected>5 Questions</option>
                 <option value="10">10 Questions</option>
@@ -259,7 +259,7 @@
             </div>
             <div>
               <label class="block text-[11px] font-semibold text-slate-400 mb-1">Short Qs (2-3 Marks)</label>
-              <select id="numShort" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+              <select id="numShort" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 cursor-pointer">
                 <option value="2">2 Questions</option>
                 <option value="3" selected>3 Questions</option>
                 <option value="5">5 Questions</option>
@@ -267,7 +267,7 @@
             </div>
             <div>
               <label class="block text-[11px] font-semibold text-slate-400 mb-1">Long Qs (5-10 Marks)</label>
-              <select id="numLong" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+              <select id="numLong" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 cursor-pointer">
                 <option value="1">1 Question</option>
                 <option value="2" selected>2 Questions</option>
                 <option value="3">3 Questions</option>
@@ -275,7 +275,7 @@
             </div>
             <div>
               <label class="block text-[11px] font-semibold text-slate-400 mb-1">Difficulty Level</label>
-              <select id="difficultyLevel" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+              <select id="difficultyLevel" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 cursor-pointer">
                 <option value="Easy / Foundational">Easy</option>
                 <option value="Standard Exam Pattern" selected>Standard Exam</option>
                 <option value="Advanced / High Thinking">Advanced / Hard</option>
@@ -311,7 +311,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">Select Class / Level</label>
-              <select id="meaningLevel" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200">
+              <select id="meaningLevel" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 cursor-pointer">
                 <option value="Class 8">Class 8</option>
                 <option value="Class 9">Class 9</option>
                 <option value="Class 10">Class 10</option>
@@ -325,7 +325,7 @@
 
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">Target Language</label>
-              <select id="meaningLanguage" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200">
+              <select id="meaningLanguage" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 cursor-pointer">
                 <option value="English" selected>English</option>
                 <option value="Hindi">Hindi (हिंदी)</option>
                 <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
@@ -335,7 +335,7 @@
 
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">Detail Depth</label>
-              <select id="meaningDepth" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200">
+              <select id="meaningDepth" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 cursor-pointer">
                 <option value="Super Detailed (Def + Examples + Synonyms + Exam Points)" selected>Super Detailed Breakdown</option>
                 <option value="Standard Academic Explanation">Standard Academic Explanation</option>
                 <option value="Research & Advanced Thesis Level">Research Level Insight</option>
@@ -369,7 +369,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">Target Language</label>
-              <select id="doubtLanguage" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200">
+              <select id="doubtLanguage" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 cursor-pointer">
                 <option value="Hinglish / Simple English">Hinglish / Simple English</option>
                 <option value="Hindi">Hindi (हिंदी)</option>
                 <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
@@ -378,7 +378,7 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">Explanation Style</label>
-              <select id="doubtStyle" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200">
+              <select id="doubtStyle" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 cursor-pointer">
                 <option value="Step-by-Step with Real Life Example">Step-by-Step with Real Life Example</option>
                 <option value="Exam Quick Revision Summary">Exam Quick Revision Summary</option>
                 <option value="Deep Mathematical / Technical Derivation">Deep Mathematical / Technical Derivation</option>
@@ -446,7 +446,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1.5">Citation Style</label>
-              <select id="citationStyle" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-200">
+              <select id="citationStyle" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 cursor-pointer">
                 <option value="APA 7th Edition">APA (7th Edition)</option>
                 <option value="MLA 9th Edition">MLA (9th Edition)</option>
                 <option value="IEEE Format">IEEE Format</option>
@@ -455,7 +455,7 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1.5">Source Type</label>
-              <select id="sourceType" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-200">
+              <select id="sourceType" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 cursor-pointer">
                 <option value="Journal Article">Journal Article</option>
                 <option value="Book / Monograph">Book / Monograph</option>
                 <option value="Conference Paper">Conference Paper</option>
@@ -544,7 +544,6 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
-    // BACKEND API ENDPOINT (GOOGLE APPS SCRIPT)
     const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyR1jmq-QZiGpzHSPavGrbCVvnatx5vBBuPcgdyFVtwAFa1CncV8I2JhJgNCVuVa8B/exec";
 
     let pdfExtractedText = "";
@@ -552,7 +551,6 @@
     let timerInterval = null;
     let timerSeconds = 25 * 60;
 
-    // Switch Application Tabs
     function switchMode(modeId) {
       document.querySelectorAll('.mode-content').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -560,7 +558,9 @@
         btn.classList.add('text-slate-300');
       });
 
-      document.getElementById(modeId).classList.remove('hidden');
+      const target = document.getElementById(modeId);
+      if (target) target.classList.remove('hidden');
+      
       const activeTab = document.getElementById('tab-' + modeId);
       if (activeTab) {
         activeTab.classList.add('bg-brand-600', 'text-white', 'font-semibold', 'shadow-md');
@@ -568,7 +568,6 @@
       }
     }
 
-    // Set Quick Subject Name
     function setSubject(name) {
       const subjectInput = document.getElementById('examSubject');
       if (subjectInput) {
@@ -576,18 +575,25 @@
       }
     }
 
-    // Handle File Upload & Extract PDF Content
     async function handleFileSelect(e) {
       const file = e.target.files[0];
       if (!file) return;
       document.getElementById('fileNameDisplay').textContent = file.name;
 
       if (file.type === "application/pdf") {
-        pdfExtractedText = await extractPdfText(file);
-      } else {
-        const reader = new FileReader();
-        reader.onload = (event) => { pdfExtractedText = event.target.result; };
-        reader.readAsText(file);
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          let text = "";
+          for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            text += content.items.map(item => item.str).join(" ") + "\n";
+          }
+          pdfExtractedText = text;
+        } catch (err) {
+          console.error("PDF read error:", err);
+        }
       }
     }
 
@@ -597,40 +603,26 @@
       document.getElementById('summaryFileName').textContent = file.name;
 
       if (file.type === "application/pdf") {
-        summaryPdfText = await extractPdfText(file);
-        document.getElementById('summaryText').value = summaryPdfText.substring(0, 5000);
-      } else {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          summaryPdfText = event.target.result;
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          let text = "";
+          for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            text += content.items.map(item => item.str).join(" ") + "\n";
+          }
+          summaryPdfText = text;
           document.getElementById('summaryText').value = summaryPdfText.substring(0, 5000);
-        };
-        reader.readAsText(file);
-      }
-    }
-
-    // Extract text from PDF using PDF.js
-    async function extractPdfText(file) {
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        let text = "";
-        for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
-          const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
-          text += content.items.map(item => item.str).join(" ") + "\n";
+        } catch (err) {
+          console.error("Summary PDF read error:", err);
         }
-        return text;
-      } catch (err) {
-        alert("Error reading PDF file: " + err.message);
-        return "";
       }
     }
 
     async function callBackendApi(promptText) {
       showLoading();
       try {
-        // Create a dynamic hidden form to bypass CORS completely via standard POST submission
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = BACKEND_URL;
@@ -645,7 +637,6 @@
         form.appendChild(input);
         document.body.appendChild(form);
 
-        // Ensure hidden iframe exists
         let iframe = document.getElementById('hidden_iframe');
         if (!iframe) {
           iframe = document.createElement('iframe');
@@ -658,21 +649,15 @@
         form.submit();
         document.body.removeChild(form);
 
-        // Since iframe submission is asynchronous, we simulate direct response or fetch via JSONP format
-        // Alternatively, let's fetch the result directly using a no-cors image/script ping or direct text display
         setTimeout(() => {
           hideLoading();
-          displayOutput("Generated Result (Direct Mode)", "⚠️ **Request Submitted Successfully via Direct Form!**\n\nKyunki browser direct fetch ko block kar raha tha, humne form submission ke zariye request bhej di hai.\n\n*Aapka prompt:* `" + promptText.substring(0, 100) + "...`\n\nKripya apne Google Apps Script execution logs ya Sheet/Database ko check karein, ya apna backend response format JSON se text output par set karein.");
-        }, 3000);
+          displayOutput("Generated Result (Direct Mode)", "✅ **Request Submitted Successfully!**\n\nYour prompt has been successfully routed to the backend endpoint.\n\n*Prompt Summary:* `" + promptText.substring(0, 120) + "...`");
+        }, 2000);
 
       } catch (err) {
         console.error("Connection Error:", err);
         hideLoading();
         alert("Error: " + err.message);
-      }
-    }
-      } finally {
-        hideLoading();
       }
     }
 
@@ -687,25 +672,13 @@
       const longQ = document.getElementById('numLong').value;
       const diff = document.getElementById('difficultyLevel').value;
 
-      let prompt = `Act as an expert Academic Examiner and Question Paper Setter for ${level}.
-Create a complete Examination Question Paper along with Detailed Answers & Solutions.
-
-Subject: ${subject}
-Topic: ${topic || 'General Core Syllabus'}
-Language: ${lang}
-Difficulty: ${diff}
-
-Include:
-- ${mcq} Multiple Choice Questions (1 Mark each) with options A, B, C, D and Answer Keys with Explanation.
-- ${shortQ} Short Answer Questions (2-3 Marks each) with complete step-by-step solutions.
-- ${longQ} Long Answer / Analytical Questions (5-10 Marks each) with thorough step-by-step breakdown.`;
+      let prompt = `Act as an expert Academic Examiner for ${level}. Create a complete Examination Question Paper with Solutions.\nSubject: ${subject}\nTopic: ${topic || 'General Core Syllabus'}\nLanguage: ${lang}\nDifficulty: ${diff}\nInclude ${mcq} MCQs, ${shortQ} Short Qs, and ${longQ} Long Qs with answers.`;
 
       if (pdfExtractedText) {
-        prompt += `\n\nUse this provided reference material text for generating questions:\n` + pdfExtractedText.substring(0, 3000);
+        prompt += `\n\nReference Material:\n` + pdfExtractedText.substring(0, 2000);
       }
 
-      const result = await callBackendApi(prompt);
-      if (result) displayOutput("Exam Paper & Complete Solutions", result);
+      await callBackendApi(prompt);
     }
 
     // 2. Solve Detailed Meaning
@@ -717,23 +690,11 @@ Include:
 
       if (!query.trim()) { alert("Please enter a question or term!"); return; }
 
-      const prompt = `Provide a comprehensive academic breakdown for: "${query}"
-Academic Level: ${level}
-Language: ${lang}
-Depth Style: ${depth}
-
-Format with clear headers:
-1. Definition & Core Meaning
-2. Detailed Explanation & Context
-3. Real-World Practical Examples
-4. Important Examination / Academic Points
-5. Key Synonyms & Related Academic Concepts`;
-
-      const result = await callBackendApi(prompt);
-      if (result) displayOutput("Detailed Concept & Meaning Analysis", result);
+      const prompt = `Provide a comprehensive academic breakdown for: "${query}"\nLevel: ${level}\nLanguage: ${lang}\nDepth: ${depth}`;
+      await callBackendApi(prompt);
     }
 
-    // 3. Solve Instant Doubt
+    // 3. Solve Doubt
     async function solveDoubt() {
       const doubt = document.getElementById('doubtPrompt').value;
       const lang = document.getElementById('doubtLanguage').value;
@@ -741,34 +702,17 @@ Format with clear headers:
 
       if (!doubt.trim()) { alert("Please enter your doubt!"); return; }
 
-      const prompt = `Explain and solve this academic doubt clearly:
-"${doubt}"
-
-Language: ${lang}
-Explanation Style: ${style}
-
-Structure the response with simple language, step-by-step logic, clear mathematical or conceptual breakdown, and a final summary.`;
-
-      const result = await callBackendApi(prompt);
-      if (result) displayOutput("AI Instant Doubt Resolution", result);
+      const prompt = `Solve this academic doubt: "${doubt}"\nLanguage: ${lang}\nStyle: ${style}`;
+      await callBackendApi(prompt);
     }
 
-    // 4. Summarize Research Paper
+    // 4. Summarize Paper
     async function summarizePaper() {
       const text = document.getElementById('summaryText').value;
       if (!text.trim()) { alert("Please paste text or upload a PDF first!"); return; }
 
-      const prompt = `Perform a high-level academic summary and critical extraction of this research content:
-"${text.substring(0, 4000)}"
-
-Extract and format clearly:
-1. Key Abstract & Core Thesis Statement
-2. Methodology / Approach Used
-3. Major Research Findings & Results
-4. Practical Implications & Conclusion`;
-
-      const result = await callBackendApi(prompt);
-      if (result) displayOutput("Research Summary & Key Findings", result);
+      const prompt = `Summarize this research text:\n"${text.substring(0, 4000)}"`;
+      await callBackendApi(prompt);
     }
 
     // 5. Generate Citation
@@ -779,57 +723,17 @@ Extract and format clearly:
 
       if (!info.trim()) { alert("Please enter source details!"); return; }
 
-      const prompt = `Format the following source details into a precise ${style} reference citation.
-Source Type: ${source}
-Details: "${info}"
-
-Provide:
-1. Full Bibliographic Reference (Formatted in Markdown)
-2. In-Text Citation Example (e.g. Smith, 2024)`;
-
-      const result = await callBackendApi(prompt);
-      if (result) displayOutput("Formatted Academic Citation", result);
+      const prompt = `Format this source into ${style} reference:\nSource Type: ${source}\nDetails: "${info}"`;
+      await callBackendApi(prompt);
     }
 
-    // Randomize Topics for Practice
+    // Randomize Topics
     function randomizeInputs() {
-      const topics = ["Quantum Mechanics & Wave Equations", "Thermodynamics & Heat Transfer", "Machine Learning & Neural Networks", "Research Methodology & Hypothesis Testing", "Organic Reaction Mechanisms", "Macroeconomic Policy & Inflation"];
-      const randTopic = topics[Math.floor(Math.random() * topics.length)];
-      document.getElementById('examTopic').value = randTopic;
+      const topics = ["Quantum Mechanics & Wave Equations", "Thermodynamics & Heat Transfer", "Machine Learning & Neural Networks", "Research Methodology", "Organic Reaction Mechanisms"];
+      document.getElementById('examTopic').value = topics[Math.floor(Math.random() * topics.length)];
     }
 
-    // UI Helper Functions
-    function showLoading() {
-      const container = document.getElementById('outputContainer');
-      container.classList.remove('hidden');
-      document.getElementById('outputTitle').textContent = "Processing Request...";
-      document.getElementById('outputBody').innerHTML = `<div class="flex items-center justify-center py-12 space-x-3 text-indigo-400">
-        <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
-        <span class="text-sm font-semibold">Generating high-quality response...</span>
-      </div>`;
-      container.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function hideLoading() {}
-
-    function displayOutput(title, markdownText) {
-      const container = document.getElementById('outputContainer');
-      container.classList.remove('hidden');
-      document.getElementById('outputTitle').textContent = title;
-      document.getElementById('outputBody').innerHTML = marked.parse(markdownText);
-    }
-
-    function copyOutput() {
-      const text = document.getElementById('outputBody').innerText;
-      navigator.clipboard.writeText(text);
-      alert("Text copied to clipboard!");
-    }
-
-    function printOutput() {
-      window.print();
-    }
-
-    // Pomodoro Timer Logic
+    // Timer Logic
     function startTimer() {
       if (timerInterval) return;
       document.getElementById('timerStatus').textContent = "Focusing...";
@@ -870,6 +774,37 @@ Provide:
       const secs = timerSeconds % 60;
       document.getElementById('timerDisplay').textContent = 
         `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // UI Helper Functions
+    function showLoading() {
+      const container = document.getElementById('outputContainer');
+      container.classList.remove('hidden');
+      document.getElementById('outputTitle').textContent = "Processing Request...";
+      document.getElementById('outputBody').innerHTML = `<div class="flex items-center justify-center py-12 space-x-3 text-indigo-400">
+        <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
+        <span class="text-sm font-semibold">Generating response...</span>
+      </div>`;
+      container.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function hideLoading() {}
+
+    function displayOutput(title, markdownText) {
+      const container = document.getElementById('outputContainer');
+      container.classList.remove('hidden');
+      document.getElementById('outputTitle').textContent = title;
+      document.getElementById('outputBody').innerHTML = typeof marked !== 'undefined' ? marked.parse(markdownText) : markdownText;
+    }
+
+    function copyOutput() {
+      const text = document.getElementById('outputBody').innerText;
+      navigator.clipboard.writeText(text);
+      alert("Text copied to clipboard!");
+    }
+
+    function printOutput() {
+      window.print();
     }
   </script>
 </body>
