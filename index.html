@@ -620,45 +620,41 @@
       }
     }
 
-    async function callBackendApi(promptText) {
+  async function callBackendApi(promptText) {
       showLoading();
       try {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = BACKEND_URL;
-        form.target = 'hidden_iframe';
-        form.style.display = 'none';
+        const response = await fetch(BACKEND_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8',
+          },
+          body: JSON.stringify({ prompt: promptText })
+        });
 
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'prompt';
-        input.value = promptText;
-
-        form.appendChild(input);
-        document.body.appendChild(form);
-
-        let iframe = document.getElementById('hidden_iframe');
-        if (!iframe) {
-          iframe = document.createElement('iframe');
-          iframe.name = 'hidden_iframe';
-          iframe.id = 'hidden_iframe';
-          iframe.style.display = 'none';
-          document.body.appendChild(iframe);
+        if (!response.ok) {
+          throw new Error(`Server status: ${response.status}`);
         }
 
-        form.submit();
-        document.body.removeChild(form);
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error);
+        }
 
-        setTimeout(() => {
-          hideLoading();
-          displayOutput("Generated Result (Direct Mode)", "✅ **Request Submitted Successfully!**\n\nYour prompt has been successfully routed to the backend endpoint.\n\n*Prompt Summary:* `" + promptText.substring(0, 120) + "...`");
-        }, 2000);
+        if (data.text) {
+          return data.text;
+        } else {
+          throw new Error("No text returned from Gemini API");
+        }
 
       } catch (err) {
-        console.error("Connection Error:", err);
+        console.error("Backend Connection Error:", err);
+        displayOutput("Connection Notice", "⚠️ **Server Communication Notice:**\n\nGoogle Apps Script backend se connect hone mein dikkat aayi hai.\n\n*Error details:* `" + err.message + "`");
+        return null;
+      } finally {
         hideLoading();
-        alert("Error: " + err.message);
       }
+    }    }
     }
 
     // 1. Generate Exam Paper
