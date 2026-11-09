@@ -546,7 +546,7 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
-    // BACKEND API ENDPOINT (GOOGLE APPS SCRIPT PROXY)
+    // BACKEND API ENDPOINT (GOOGLE APPS SCRIPT)
     const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyR1jmq-QZiGpzHSPavGrbCVvnatx5vBBuPcgdyFVtwAFa1CncV8I2JhJgNCVuVa8B/exec";
 
     let pdfExtractedText = "";
@@ -626,57 +626,36 @@
       }
     }
 
-    // Call Backend Proxy API with AllOrigins GET & JSON Parsing Support
+    // Robust Backend API Call with Graceful Error Handling
     async function callBackendApi(promptText) {
       showLoading();
       try {
-        // Using a reliable direct JSON approach via alternative fetch options
         const response = await fetch(BACKEND_URL, {
           method: 'POST',
-          mode: 'no-cors',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'text/plain;charset=utf-8',
           },
           body: JSON.stringify({ prompt: promptText })
         });
-        
-        // Since 'no-cors' returns an opaque response, we fetch via a guaranteed JSON text proxy method
-        const fallbackUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(BACKEND_URL + "?prompt=" + encodeURIComponent(promptText));
-        const res = await fetch(fallbackUrl);
-        const textData = await res.text();
-        
-        try {
-          const json = JSON.parse(textData);
-          if (json.error) throw new Error(json.error);
-          return json.text;
-        } catch (parseErr) {
-          // If raw text is already the result or needs formatting
-          if (textData && textData.length > 10) {
-            return textData;
-          }
-          throw new Error("Invalid response received from server.");
+
+        if (!response.ok) {
+          throw new Error(`Server responded with status: ${response.status}`);
         }
+
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        
+        return data.text;
       } catch (err) {
-        alert("Error connecting to server: " + err.message);
+        console.error("Backend Connection Error:", err);
+        displayOutput("Connection Notice", "⚠️ **Server Communication Notice:**\n\nGoogle Apps Script backend tak request pohochne mein network ya CORS restriction aayi hai. Kripya ensure karein ki aapka Google Apps Script ka naya deployment active hai aur proper JSON response return kar raha hai.\n\n*Error details:* `" + err.message + "`");
         return null;
       } finally {
         hideLoading();
       }
-    }
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: promptText })
-          });
-          const data2 = await res2.json();
-          if (data2.error) throw new Error(data2.error);
-          return data2.text;
-        } catch (innerErr) {
-          alert("Error connecting to server: " + innerErr.message);
-          return null;
-        }
-      } finally {
-        hideLoading();
-      }
-    }
     }
 
     // 1. Generate Exam Paper
