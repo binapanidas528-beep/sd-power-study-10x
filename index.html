@@ -620,7 +620,7 @@
       }
     }
 
-  async function callBackendApi(promptText) {
+    async function callBackendApi(promptText) {
       showLoading();
       try {
         const response = await fetch(BACKEND_URL, {
@@ -654,7 +654,6 @@
       } finally {
         hideLoading();
       }
-    }    }
     }
 
     // 1. Generate Exam Paper
@@ -674,7 +673,8 @@
         prompt += `\n\nReference Material:\n` + pdfExtractedText.substring(0, 2000);
       }
 
-      await callBackendApi(prompt);
+      const result = await callBackendApi(prompt);
+      if (result) displayOutput("Generated Exam Paper & Solutions", result);
     }
 
     // 2. Solve Detailed Meaning
@@ -687,7 +687,8 @@
       if (!query.trim()) { alert("Please enter a question or term!"); return; }
 
       const prompt = `Provide a comprehensive academic breakdown for: "${query}"\nLevel: ${level}\nLanguage: ${lang}\nDepth: ${depth}`;
-      await callBackendApi(prompt);
+      const result = await callBackendApi(prompt);
+      if (result) displayOutput("Detailed Q&A & Meaning Analysis", result);
     }
 
     // 3. Solve Doubt
@@ -699,7 +700,8 @@
       if (!doubt.trim()) { alert("Please enter your doubt!"); return; }
 
       const prompt = `Solve this academic doubt: "${doubt}"\nLanguage: ${lang}\nStyle: ${style}`;
-      await callBackendApi(prompt);
+      const result = await callBackendApi(prompt);
+      if (result) displayOutput("AI Doubt Solution", result);
     }
 
     // 4. Summarize Paper
@@ -708,7 +710,8 @@
       if (!text.trim()) { alert("Please paste text or upload a PDF first!"); return; }
 
       const prompt = `Summarize this research text:\n"${text.substring(0, 4000)}"`;
-      await callBackendApi(prompt);
+      const result = await callBackendApi(prompt);
+      if (result) displayOutput("Research Paper Summary", result);
     }
 
     // 5. Generate Citation
@@ -720,7 +723,8 @@
       if (!info.trim()) { alert("Please enter source details!"); return; }
 
       const prompt = `Format this source into ${style} reference:\nSource Type: ${source}\nDetails: "${info}"`;
-      await callBackendApi(prompt);
+      const result = await callBackendApi(prompt);
+      if (result) displayOutput("Formatted Academic Citation", result);
     }
 
     // Randomize Topics
@@ -779,7 +783,7 @@
       document.getElementById('outputTitle').textContent = "Processing Request...";
       document.getElementById('outputBody').innerHTML = `<div class="flex items-center justify-center py-12 space-x-3 text-indigo-400">
         <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
-        <span class="text-sm font-semibold">Generating response...</span>
+        <span class="text-sm font-semibold">Generating high-quality response...</span>
       </div>`;
       container.scrollIntoView({ behavior: 'smooth' });
     }
