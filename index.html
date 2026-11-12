@@ -48,6 +48,18 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
   </script>
 
+  <!-- MathJax Configuration for Clean Math Formulas -->
+  <script>
+    window.MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        },
+        svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Hind:wght@400;600;700&family=Inter:wght@300;400;600;700;800&display=swap');
     
@@ -527,28 +539,36 @@
         </div>
 
         <div class="flex items-center space-x-2 text-xs">
-          <button type="button" onclick="copyOutput()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center space-x-1 cursor-pointer">
-            <i class="fa-solid fa-copy text-indigo-400"></i>
-            <span>Copy Text</span>
+          <button type="button" onclick="copyOutput()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium border border-slate-700 transition cursor-pointer">
+            <i class="fa-regular fa-copy mr-1"></i> Copy Text
           </button>
-          <button type="button" onclick="window.print()" class="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white transition flex items-center space-x-1 cursor-pointer">
-            <i class="fa-solid fa-print"></i>
-            <span>Print / PDF</span>
+          <button type="button" onclick="printPDF()" class="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-medium transition cursor-pointer">
+            <i class="fa-solid fa-print mr-1"></i> Print / PDF
           </button>
         </div>
       </div>
 
-      <div id="outputContent" class="prose prose-invert max-w-none text-slate-200 text-sm leading-relaxed custom-scrollbar max-h-[600px] overflow-y-auto pr-2">
-        <!-- Results rendered here -->
+      <!-- Result Text Body -->
+      <div id="outputContent" class="prose prose-invert max-w-none text-slate-200 text-sm leading-relaxed custom-scrollbar max-h-[600px] overflow-y-auto whitespace-pre-line">
+        <!-- Content gets injected here -->
+      </div>
+
+      <!-- LOAD MORE BUTTON -->
+      <div id="loadMoreContainer" class="hidden pt-3 border-t border-slate-800/80 no-print">
+        <button type="button" onclick="loadMoreContent()" id="loadMoreBtn" class="w-full bg-slate-800/80 hover:bg-slate-700 text-indigo-300 font-semibold py-3 rounded-xl border border-indigo-500/30 transition flex items-center justify-center space-x-2 text-sm cursor-pointer">
+          <i class="fa-solid fa-plus-circle"></i>
+          <span>Generate More Questions & Detailed Solutions</span>
+        </button>
       </div>
     </div>
 
   </main>
 
-  <!-- JavaScript Logic -->
+  <!-- JavaScript App Logic -->
   <script>
     const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxqowDffgIhL5LtLZyj-mclFsJW_1JU3UD_nz2hiGbQCCqnlwgaUBO2iwBjwtG03H7o/exec";
     let currentMode = 'mode-exam';
+    let lastPromptText = '';
 
     function switchMode(modeId) {
       document.querySelectorAll('.mode-content').forEach(el => el.classList.add('hidden'));
@@ -557,193 +577,210 @@
       });
 
       document.getElementById(modeId).classList.remove('hidden');
-      const activeTab = document.getElementById('tab-' + modeId);
-      if (activeTab) {
-        activeTab.className = "tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 transition-all duration-200 bg-brand-600 text-white font-semibold shadow-md shadow-brand-600/30 cursor-pointer";
+      const activeBtn = document.getElementById('tab-' + modeId);
+      if (activeBtn) {
+        activeBtn.className = "tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 transition-all duration-200 bg-brand-600 text-white font-semibold shadow-md shadow-brand-600/30 cursor-pointer";
       }
       currentMode = modeId;
     }
 
-    function setSubject(subjectName) {
-      document.getElementById('examSubject').value = subjectName;
+    function setSubject(subj) {
+      document.getElementById('examSubject').value = subj;
+    }
+
+    function renderMath() {
+      if (window.MathJax && window.MathJax.typesetPromise) {
+          MathJax.typesetPromise([document.getElementById('outputContent')]).catch((err) => console.log(err));
+      }
     }
 
     function randomizeInputs() {
-      const subjects = ['Quantum Computing', 'Artificial Intelligence', 'Thermodynamics', 'Organic Chemistry', 'Data Structures', 'Microbiology', 'Macroeconomics'];
-      const topics = ['Core Fundamentals & Architecture', 'Recent Research Breakthroughs', 'Mathematical Modeling & Analysis', 'Practical Industrial Applications'];
-      
-      const randSub = subjects[Math.floor(Math.random() * subjects.length)];
-      const randTop = topics[Math.floor(Math.random() * topics.length)];
+      const subjects = ['Physics', 'Mathematics', 'Computer Science', 'Artificial Intelligence', 'Organic Chemistry', 'Quantum Mechanics'];
+      const topics = ['Advanced Algorithms', 'Thermodynamics', 'Linear Algebra', 'Neural Networks', 'Electromagnetic Induction'];
+      const levels = ['Class 10', 'Class 12', 'Graduation (UG)', 'PhD / Doctorate'];
+      const langs = ['English', 'Hindi', 'Odia', 'Bangla'];
 
-      document.getElementById('examSubject').value = randSub;
-      document.getElementById('examTopic').value = randTop;
+      document.getElementById('examSubject').value = subjects[Math.floor(Math.random() * subjects.length)];
+      document.getElementById('examTopic').value = topics[Math.floor(Math.random() * topics.length)];
+      document.getElementById('examLevel').value = levels[Math.floor(Math.random() * levels.length)];
+      document.getElementById('examLanguage').value = langs[Math.floor(Math.random() * langs.length)];
     }
 
+    let uploadedFileText = "";
     function handleFileSelect(event) {
       const file = event.target.files[0];
-      if (file) {
-        document.getElementById('fileNameDisplay').innerText = file.name;
-        if (file.type === "text/plain") {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            document.getElementById('examTopic').value = "File Content: " + e.target.result.substring(0, 100) + "...";
-          };
-          reader.readAsText(file);
-        }
-      }
+      if (!file) return;
+      document.getElementById('fileNameDisplay').textContent = file.name;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadedFileText = e.target.result;
+      };
+      reader.readAsText(file);
     }
 
+    let summaryUploadedText = "";
     function handleSummaryPdfSelect(event) {
       const file = event.target.files[0];
-      if (file) {
-        document.getElementById('summaryFileName').innerText = file.name;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('summaryText').value = e.target.result;
-        };
-        reader.readAsText(file);
+      if (!file) return;
+      document.getElementById('summaryFileName').textContent = file.name;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        summaryUploadedText = e.target.result;
+      };
+      reader.readAsText(file);
+    }
+
+    function executeBackendQuery(prompt, titleText, isAppending = false) {
+      lastPromptText = prompt;
+      const outputContainer = document.getElementById('outputContainer');
+      const outputContent = document.getElementById('outputContent');
+      const outputTitle = document.getElementById('outputTitle');
+      const loadMoreContainer = document.getElementById('loadMoreContainer');
+
+      outputContainer.classList.remove('hidden');
+      outputTitle.textContent = titleText;
+
+      if (!isAppending) {
+        outputContent.innerHTML = '<div class="flex items-center space-x-3 py-6 justify-center text-indigo-400"><i class="fa-solid fa-spinner fa-spin text-xl"></i><span>Generating elite academic response and step-by-step solutions... Please wait...</span></div>';
+        loadMoreContainer.classList.add('hidden');
+      } else {
+        document.getElementById('loadMoreBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Generating More...</span>';
       }
+
+      const script = document.createElement('script');
+      const callbackName = 'cb_' + Math.random().toString(36).substring(2);
+
+      window[callbackName] = function(data) {
+        if (isAppending) {
+          outputContent.innerHTML += "\n\n--- ➕ Additional Generated Questions & Solutions ---\n\n" + (data.text || "No response received.");
+          document.getElementById('loadMoreBtn').innerHTML = '<i class="fa-solid fa-plus-circle"></i><span>Generate More Questions & Detailed Solutions</span>';
+        } else {
+          outputContent.innerHTML = data.text || "No response received.";
+        }
+        renderMath();
+        loadMoreContainer.classList.remove('hidden');
+        document.head.removeChild(script);
+        delete window[callbackName];
+      };
+
+      script.src = `${BACKEND_URL}?prompt=${encodeURIComponent(prompt)}&callback=${callbackName}`;
+      document.head.appendChild(script);
     }
 
     function generateExamPaper() {
       const level = document.getElementById('examLevel').value;
       const lang = document.getElementById('examLanguage').value;
-      const subject = document.getElementById('examSubject').value || 'General Science';
-      const topic = document.getElementById('examTopic').value || 'Comprehensive Syllabus';
+      const subject = document.getElementById('examSubject').value || "General Science";
+      const topic = document.getElementById('examTopic').value || "Core Curriculum";
       const mcq = document.getElementById('numMcq').value;
-      const shrt = document.getElementById('numShort').value;
-      const lng = document.getElementById('numLong').value;
+      const short = document.getElementById('numShort').value;
+      const long = document.getElementById('numLong').value;
       const diff = document.getElementById('difficultyLevel').value;
 
-      const prompt = `Act as an expert Academic Examiner. Generate a detailed examination paper for Class/Level: ${level}, Subject: ${subject}, Topic: ${topic}, Language: ${lang}, Difficulty: ${diff}. Include ${mcq} Multiple Choice Questions (with options and correct answers), ${shrt} Short Answer Questions (with detailed solutions), and ${lng} Long Answer / Research Analysis questions (with comprehensive answers).`;
+      let prompt = `Create a comprehensive, elite academic exam paper with detailed step-by-step solutions for ${level} in subject '${subject}' on topic '${topic}'. Target Language: ${lang}. Difficulty: ${diff}. Include exactly ${mcq} MCQs (1 mark each), ${short} Short Answer questions, and ${long} Long Answer/Research questions with complete derivations and answer keys.`;
+      
+      if (uploadedFileText) {
+        prompt += ` Reference Material / Notes: ${uploadedFileText.substring(0, 3000)}`;
+      }
 
-      callCloudBackend(prompt, "Generated Exam Paper & Solutions");
+      executeBackendQuery(prompt, `Generated Exam Paper & Solutions (${subject} - ${level})`);
     }
 
     function solveDetailedQuery() {
       const level = document.getElementById('meaningLevel').value;
       const lang = document.getElementById('meaningLanguage').value;
       const depth = document.getElementById('meaningDepth').value;
-      const query = document.getElementById('meaningQuery').value.trim();
+      const query = document.getElementById('meaningQuery').value;
 
-      if (!query) {
-        alert("Please enter a term, question, or concept to solve.");
+      if (!query.trim()) {
+        alert("Please enter a question, word, or term to analyze!");
         return;
       }
 
-      const prompt = `Act as an expert professor and researcher. Provide a ${depth} for the following query at ${level} academic level in ${lang}: "${query}". Include definition, core principles, examples, and key insights.`;
-
-      callCloudBackend(prompt, "Detailed Q&A & Word Meaning Breakdown");
+      const prompt = `Provide a 360-degree deep Q&A breakdown, word meaning, definition, synonyms, and analysis for '${query}' for ${level} level. Language: ${lang}. Depth: ${depth}.`;
+      executeBackendQuery(prompt, `Detailed Q&A & Word Meaning Breakdown`);
     }
 
     function solveDoubt() {
       const lang = document.getElementById('doubtLanguage').value;
       const style = document.getElementById('doubtStyle').value;
-      const doubt = document.getElementById('doubtPrompt').value.trim();
+      const doubt = document.getElementById('doubtPrompt').value;
 
-      if (!doubt) {
-        alert("Please type or paste your doubt.");
+      if (!doubt.trim()) {
+        alert("Please enter your doubt or problem!");
         return;
       }
 
-      const prompt = `Act as a 24/7 expert AI tutor. Explain the following doubt in ${lang} using style '${style}': "${doubt}". Make it extremely clear, structured, and easy to understand.`;
-
-      callCloudBackend(prompt, "AI Doubt Solver & Concept Explanation");
+      const prompt = `Solve this academic/technical doubt: '${doubt}'. Target Language: ${lang}. Explanation Style: ${style}. Provide a clear, structured response.`;
+      executeBackendQuery(prompt, `AI Instant Doubt Solver & Concept Explainer`);
     }
 
     function summarizePaper() {
-      const text = document.getElementById('summaryText').value.trim();
-      if (!text) {
-        alert("Please paste research text or upload a PDF/text file first.");
+      let text = document.getElementById('summaryText').value;
+      if (!text.trim() && summaryUploadedText) {
+        text = summaryUploadedText;
+      }
+      if (!text.trim()) {
+        alert("Please paste research text or upload a PDF file!");
         return;
       }
 
-      const prompt = `Act as an expert research analyst. Summarize the following text/paper. Extract: 1. Executive Summary, 2. Key Objectives, 3. Methodology, 4. Major Findings & Results, and 5. Conclusion & Future Scope:\n\n${text}`;
-
-      callCloudBackend(prompt, "Research Paper Summary & Key Insights");
+      const prompt = `Extract key insights, abstract, research methodology, findings, and conclusion from the following research text:\n\n${text.substring(0, 4000)}`;
+      executeBackendQuery(prompt, `Research Paper & PDF Summary`);
     }
 
     function generateCitation() {
       const style = document.getElementById('citationStyle').value;
       const type = document.getElementById('sourceType').value;
-      const details = document.getElementById('citationInput').value.trim();
+      const details = document.getElementById('citationInput').value;
 
-      if (!details) {
-        alert("Please enter source details (Title, Author, Year, etc.).");
+      if (!details.trim()) {
+        alert("Please enter source details!");
         return;
       }
 
-      const prompt = `Generate a perfectly formatted academic citation and reference in ${style} format for a ${type} with the following details: "${details}". Provide both in-text citation and full reference list entry.`;
-
-      callCloudBackend(prompt, "Generated Academic Citation & Reference");
+      const prompt = `Generate a perfectly formatted academic citation and reference in ${style} format for this ${type}: ${details}`;
+      executeBackendQuery(prompt, `Formatted Academic Citation (${style})`);
     }
 
-    function callCloudBackend(prompt, outputTitleText) {
-      const container = document.getElementById('outputContainer');
-      const content = document.getElementById('outputContent');
-      const title = document.getElementById('outputTitle');
-
-      container.classList.remove('hidden');
-      title.innerText = outputTitleText;
-      content.innerHTML = `<div class="flex items-center justify-center py-12 space-x-3 text-brand-400">
-        <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
-        <span class="text-sm font-semibold">Generating smart academic response from cloud backend...</span>
-      </div>`;
-
-      container.scrollIntoView({ behavior: 'smooth' });
-
-      const scriptUrl = `${BACKEND_URL}?prompt=${encodeURIComponent(prompt)}&callback=handleApiResponse`;
-      
-      const oldScript = document.getElementById('jsonpScript');
-      if (oldScript) oldScript.remove();
-
-      const script = document.createElement('script');
-      script.id = 'jsonpScript';
-      script.src = scriptUrl;
-      document.body.appendChild(script);
-    }
-
-    function handleApiResponse(data) {
-      const content = document.getElementById('outputContent');
-      if (data && data.text) {
-        content.innerHTML = marked.parse(data.text);
-      } else {
-        content.innerHTML = `<p class="text-red-400 font-semibold">Error receiving response from cloud backend. Please try again.</p>`;
-      }
+    function loadMoreContent() {
+      if (!lastPromptText) return;
+      executeBackendQuery(lastPromptText + " (Provide additional non-repeating advanced questions and detailed solutions)", "Additional Generated Questions & Solutions", true);
     }
 
     function copyOutput() {
       const text = document.getElementById('outputContent').innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Result copied to clipboard successfully!");
-      });
+      navigator.clipboard.writeText(text);
+      alert("Output copied to clipboard successfully!");
     }
 
-    // Pomodoro Timer Logic
+    function printPDF() {
+      window.print();
+    }
+
+    // Focus Timer Logic
     let timerInterval = null;
-    let totalSeconds = 25 * 60;
+    let timeLeft = 25 * 60;
     let isRunning = false;
 
     function updateTimerDisplay() {
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      document.getElementById('timerDisplay').innerText = 
-        String(minutes).padStart(2, '0') + ":" + String(seconds).padStart(2, '0');
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      document.getElementById('timerDisplay').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
     function startTimer() {
       if (isRunning) return;
       isRunning = true;
-      document.getElementById('timerStatus').innerText = "Focus Session Active 🔥";
+      document.getElementById('timerStatus').textContent = "Focus Session Active 🔥";
       timerInterval = setInterval(() => {
-        if (totalSeconds > 0) {
-          totalSeconds--;
+        if (timeLeft > 0) {
+          timeLeft--;
           updateTimerDisplay();
         } else {
           clearInterval(timerInterval);
           isRunning = false;
-          alert("Focus session completed! Great job!");
-          document.getElementById('timerStatus').innerText = "Session Completed 🎉";
+          alert("Focus session completed! Great job! 🎉");
         }
       }, 1000);
     }
@@ -751,23 +788,23 @@
     function pauseTimer() {
       clearInterval(timerInterval);
       isRunning = false;
-      document.getElementById('timerStatus').innerText = "Paused ⏸️";
+      document.getElementById('timerStatus').textContent = "Session Paused ⏸️";
     }
 
     function resetTimer() {
       clearInterval(timerInterval);
       isRunning = false;
-      totalSeconds = 25 * 60;
+      timeLeft = 25 * 60;
       updateTimerDisplay();
-      document.getElementById('timerStatus').innerText = "Focus Session";
+      document.getElementById('timerStatus').textContent = "Focus Session";
     }
 
     function setTimerDuration(mins) {
       clearInterval(timerInterval);
       isRunning = false;
-      totalSeconds = mins * 60;
+      timeLeft = mins * 60;
       updateTimerDisplay();
-      document.getElementById('timerStatus').innerText = mins === 5 ? "Break Time ☕" : "Focus Session";
+      document.getElementById('timerStatus').textContent = mins === 5 ? "Break Time ☕" : "Focus Session";
     }
   </script>
 </body>
