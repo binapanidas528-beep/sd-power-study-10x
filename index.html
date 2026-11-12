@@ -630,24 +630,6 @@
       reader.readAsText(file);
     }
 
-    async function executeBackendQuery(prompt, titleText, isAppending = false) {
-    lastPromptText = prompt;
-    const outputContainer = document.getElementById('outputContainer');
-    const outputContent = document.getElementById('outputContent');
-    const outputTitle = document.getElementById('outputTitle');
-    const loadMoreContainer = document.getElementById('loadMoreContainer');
-
-    outputContainer.classList.remove('hidden');
-    outputTitle.textContent = titleText;
-
-    if (isAppending) {
-        outputContent.innerHTML += '<div class="flex items-center space-x-3 py-6 justify-center text-indigo-400"><i class="fa-solid fa-spinner fa-spin"></i><span>Generating More...</span></div>';
-        loadMoreContainer.classList.add('hidden');
-    } else {
-        outputContent.innerHTML = '<div class="flex items-center space-x-3 py-12 justify-center text-indigo-400 text-base"><i class="fa-solid fa-spinner fa-spin text-2xl"></i><span>Generating with Gemini AI... Please wait</span></div>';
-        loadMoreContainer.classList.add('hidden');
-    }
-
     try {
         const GEMINI_API_KEY = "AQ.Ab8RN6K7RUoguEzi5LX4H7PYUFOBWVW1YKOaOi40VYtuLMlRZA";
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
@@ -662,12 +644,32 @@
 
         const data = await response.json();
         
-        if (data.candidates && data.candidates[0].content) {
-            const rawText = data.candidates[0].content.parts[0].text;
-            const formattedHTML = marked.parse(rawText);
+        // Safe check for Gemini API response structure
+        let rawText = "";
+        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
+            rawText = data.candidates[0].content.parts[0].text;
+        } else if (data.error) {
+            rawText = "API Error: " + data.error.message;
+        } else {
+            rawText = JSON.stringify(data);
+        }
 
-            if (isAppending) {
-                // Remove loading spinner and append text
+        const formattedHTML = marked.parse(rawText);
+
+        if (isAppending) {
+            outputContent.innerHTML = outputContent.innerHTML.replace(/<div class="flex items-center space-x-3 py-6.*?<\/div>/g, '');
+            outputContent.innerHTML += '<hr class="my-6 border-slate-800">' + formattedHTML;
+        } else {
+            outputContent.innerHTML = formattedHTML;
+        }
+
+        if (typeof renderMath === 'function') renderMath();
+        loadMoreContainer.classList.remove('hidden');
+
+    } catch (err) {
+        console.error("Gemini Error:", err);
+        outputContent.innerHTML = `<p class="text-rose-400 font-semibold">Error generating response: ${err.message}. Please try again.</p>`;
+    }
                 outputContent.innerHTML = outputContent.innerHTML.replace(/<div class="flex items-center space-x-3 py-6.*?<\/div>/g, '');
                 outputContent.innerHTML += '<hr class="my-6 border-slate-800">' + formattedHTML;
             } else {
