@@ -533,40 +533,45 @@
     <!-- SHARED OUTPUT DISPLAY CONTAINER -->
     <div id="outputContainer" class="glass-card rounded-2xl p-5 lg:p-7 border border-slate-800 shadow-2xl hidden space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4 no-print">
+        <h3 id="outputTitle" class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-square-poll-vertical text-brand-400"></i> Generated Results
+        </h3>
         <div class="flex items-center space-x-2">
-          <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-          <h3 class="text-base font-bold text-white" id="outputTitle">Generated Result</h3>
-        </div>
-
-        <div class="flex items-center space-x-2 text-xs">
-          <button type="button" onclick="copyOutput()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium border border-slate-700 transition cursor-pointer">
-            <i class="fa-regular fa-copy mr-1"></i> Copy Text
+          <button type="button" onclick="copyOutput()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 border border-slate-700 cursor-pointer">
+            <i class="fa-regular fa-copy"></i>
+            <span>Copy Text</span>
           </button>
-          <button type="button" onclick="printPDF()" class="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-medium transition cursor-pointer">
-            <i class="fa-solid fa-print mr-1"></i> Print / PDF
+          <button type="button" onclick="window.print()" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 shadow-md shadow-brand-600/30 cursor-pointer">
+            <i class="fa-solid fa-print"></i>
+            <span>Print / PDF</span>
           </button>
         </div>
       </div>
 
-      <!-- Result Text Body -->
-      <div id="outputContent" class="prose prose-invert max-w-none text-slate-200 text-sm leading-relaxed custom-scrollbar max-h-[600px] overflow-y-auto whitespace-pre-line">
-        <!-- Content gets injected here -->
+      <!-- Main Rendered Content Area -->
+      <div id="outputContent" class="prose prose-invert max-w-none text-slate-200 text-sm leading-relaxed custom-scrollbar overflow-x-auto space-y-4">
+        <!-- AI Response Appends Here -->
       </div>
 
-      <!-- LOAD MORE BUTTON -->
-      <div id="loadMoreContainer" class="hidden pt-3 border-t border-slate-800/80 no-print">
-        <button type="button" onclick="loadMoreContent()" id="loadMoreBtn" class="w-full bg-slate-800/80 hover:bg-slate-700 text-indigo-300 font-semibold py-3 rounded-xl border border-indigo-500/30 transition flex items-center justify-center space-x-2 text-sm cursor-pointer">
+      <!-- Load More / Append Options -->
+      <div id="loadMoreContainer" class="pt-4 border-t border-slate-800/80 flex items-center justify-between hidden no-print">
+        <p class="text-xs text-slate-400">Want more questions or deeper insights on this topic?</p>
+        <button type="button" onclick="loadMoreContent()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-brand-400 border border-brand-500/30 rounded-xl text-xs font-semibold transition flex items-center space-x-2 cursor-pointer">
           <i class="fa-solid fa-plus-circle"></i>
-          <span>Generate More Questions & Detailed Solutions</span>
+          <span>Generate More Questions & Details</span>
         </button>
       </div>
     </div>
 
   </main>
 
-  <!-- JavaScript App Logic -->
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-800/80 py-6 text-center text-xs text-slate-500 no-print">
+    <p>sd study 10x • Powered by Google Gemini AI • Designed for Students & Researchers Worldwide</p>
+  </footer>
+
+  <!-- JavaScript Application Logic -->
   <script>
-    const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxqowDffgIhL5LtLZyj-mclFsJW_1JU3UD_nz2hiGbQCCqnlwgaUBO2iwBjwtG03H7o/exec";
     let currentMode = 'mode-exam';
     let lastPromptText = '';
 
@@ -579,7 +584,7 @@
       document.getElementById(modeId).classList.remove('hidden');
       const activeBtn = document.getElementById('tab-' + modeId);
       if (activeBtn) {
-        activeBtn.className = "tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 transition-all duration-200 bg-brand-600 text-white font-semibold shadow-md shadow-brand-600/30 cursor-pointer";
+        activeBtn.className = "tab-btn flex-1 min-w-[130px] py-2.5 px-3 rounded-xl flex items-center justify-center space-x-2 bg-brand-600 text-white font-semibold shadow-md shadow-brand-600/30 cursor-pointer";
       }
       currentMode = modeId;
     }
@@ -590,7 +595,7 @@
 
     function renderMath() {
       if (window.MathJax && window.MathJax.typesetPromise) {
-          MathJax.typesetPromise([document.getElementById('outputContent')]).catch((err) => console.log(err));
+        MathJax.typesetPromise([document.getElementById('outputContent')]).catch((err) => console.log(err));
       }
     }
 
@@ -626,11 +631,31 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         summaryUploadedText = e.target.result;
+        document.getElementById('summaryText').value = summaryUploadedText.substring(0, 3000) + "... [Loaded File Content]";
       };
       reader.readAsText(file);
     }
 
-    try {
+    // MAIN GEMINI BACKEND QUERY FUNCTION
+    async function executeBackendQuery(prompt, titleText, isAppending = false) {
+      lastPromptText = prompt;
+      const outputContainer = document.getElementById('outputContainer');
+      const outputContent = document.getElementById('outputContent');
+      const outputTitle = document.getElementById('outputTitle');
+      const loadMoreContainer = document.getElementById('loadMoreContainer');
+
+      outputContainer.classList.remove('hidden');
+      outputTitle.textContent = titleText;
+
+      if (isAppending) {
+        outputContent.innerHTML += '<div class="flex items-center space-x-3 py-6 justify-center text-indigo-400"><i class="fa-solid fa-spinner fa-spin"></i><span>Generating More...</span></div>';
+        loadMoreContainer.classList.add('hidden');
+      } else {
+        outputContent.innerHTML = '<div class="flex items-center space-x-3 py-12 justify-center text-indigo-400 text-base"><i class="fa-solid fa-spinner fa-spin text-2xl"></i><span>Generating with Google Gemini AI... Please wait</span></div>';
+        loadMoreContainer.classList.add('hidden');
+      }
+
+      try {
         const GEMINI_API_KEY = "AQ.Ab8RN6K7RUoguEzi5LX4H7PYUFOBWVW1YKOaOi40VYtuLMlRZA";
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
         
@@ -638,13 +663,12 @@
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt + " (Keep response structured, clean, and in Markdown format)" }] }]
+                contents: [{ parts: [{ text: prompt + " (Keep response structured, clean, and in Markdown format with LaTeX math notation where applicable)" }] }]
             })
         });
 
         const data = await response.json();
         
-        // Safe check for Gemini API response structure
         let rawText = "";
         if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
             rawText = data.candidates[0].content.parts[0].text;
@@ -666,41 +690,36 @@
         if (typeof renderMath === 'function') renderMath();
         loadMoreContainer.classList.remove('hidden');
 
-    } catch (err) {
+      } catch (err) {
         console.error("Gemini Error:", err);
         outputContent.innerHTML = `<p class="text-rose-400 font-semibold">Error generating response: ${err.message}. Please try again.</p>`;
+      }
     }
-                outputContent.innerHTML = outputContent.innerHTML.replace(/<div class="flex items-center space-x-3 py-6.*?<\/div>/g, '');
-                outputContent.innerHTML += '<hr class="my-6 border-slate-800">' + formattedHTML;
-            } else {
-                outputContent.innerHTML = formattedHTML;
-            }
-
-            if (typeof renderMath === 'function') renderMath();
-            loadMoreContainer.classList.remove('hidden');
-        } else {
-            throw new Error("Invalid API response format");
-        }
-    } catch (err) {
-        console.error("Gemini Error:", err);
-        outputContent.innerHTML = `<p class="text-rose-400 font-semibold">Error generating response: ${err.message}. Please try again.</p>`;
-    }
-}
 
     function generateExamPaper() {
       const level = document.getElementById('examLevel').value;
       const lang = document.getElementById('examLanguage').value;
-      const subject = document.getElementById('examSubject').value || "General Science";
-      const topic = document.getElementById('examTopic').value || "Core Curriculum";
+      const subject = document.getElementById('examSubject').value || 'General Science';
+      const topic = document.getElementById('examTopic').value || 'Core Curriculum';
       const mcq = document.getElementById('numMcq').value;
       const short = document.getElementById('numShort').value;
       const long = document.getElementById('numLong').value;
       const diff = document.getElementById('difficultyLevel').value;
 
-      let prompt = `Create a comprehensive, elite academic exam paper with detailed step-by-step solutions for ${level} in subject '${subject}' on topic '${topic}'. Target Language: ${lang}. Difficulty: ${diff}. Include exactly ${mcq} MCQs (1 mark each), ${short} Short Answer questions, and ${long} Long Answer/Research questions with complete derivations and answer keys.`;
+      let prompt = `Create a comprehensive academic examination paper and detailed answer key in ${lang} for academic level: ${level}.
+      Subject: ${subject}
+      Specific Topic/Chapter: ${topic}
+      Difficulty: ${diff}
       
+      Requirements:
+      1. ${mcq} Multiple Choice Questions (MCQs) with options and correct answers.
+      2. ${short} Short Answer Questions (2-3 marks each) with clear, precise solutions.
+      3. ${long} Long Answer / Essay / Derivation Questions (5-10 marks each) with extensive step-by-step explanations.
+      
+      Format the entire output in clean Markdown with proper headings and LaTeX math formatting.`;
+
       if (uploadedFileText) {
-        prompt += ` Reference Material / Notes: ${uploadedFileText.substring(0, 3000)}`;
+        prompt += `\n\nReference Uploaded Notes/Context:\n${uploadedFileText.substring(0, 4000)}`;
       }
 
       executeBackendQuery(prompt, `Generated Exam Paper & Solutions (${subject} - ${level})`);
@@ -710,75 +729,86 @@
       const level = document.getElementById('meaningLevel').value;
       const lang = document.getElementById('meaningLanguage').value;
       const depth = document.getElementById('meaningDepth').value;
-      const query = document.getElementById('meaningQuery').value;
+      const query = document.getElementById('meaningQuery').value.trim();
 
-      if (!query.trim()) {
-        alert("Please enter a question, word, or term to analyze!");
+      if (!query) {
+        alert('Please enter a term or question to analyze.');
         return;
       }
 
-      const prompt = `Provide a 360-degree deep Q&A breakdown, word meaning, definition, synonyms, and analysis for '${query}' for ${level} level. Language: ${lang}. Depth: ${depth}.`;
-      executeBackendQuery(prompt, `Detailed Q&A & Word Meaning Breakdown`);
+      const prompt = `Provide a ${depth} analysis and breakdown in ${lang} for academic level ${level}:
+      Query / Term: "${query}"
+      
+      Include definitions, core principles, contextual examples, synonyms or related concepts, and key academic/exam takeaways.`;
+
+      executeBackendQuery(prompt, `Detailed Analysis & Meaning (${query})`);
     }
 
     function solveDoubt() {
       const lang = document.getElementById('doubtLanguage').value;
       const style = document.getElementById('doubtStyle').value;
-      const doubt = document.getElementById('doubtPrompt').value;
+      const promptText = document.getElementById('doubtPrompt').value.trim();
 
-      if (!doubt.trim()) {
-        alert("Please enter your doubt or problem!");
+      if (!promptText) {
+        alert('Please type or paste your doubt.');
         return;
       }
 
-      const prompt = `Solve this academic/technical doubt: '${doubt}'. Target Language: ${lang}. Explanation Style: ${style}. Provide a clear, structured response.`;
-      executeBackendQuery(prompt, `AI Instant Doubt Solver & Concept Explainer`);
+      const prompt = `Act as an expert 24/7 AI Tutor. Explain the following doubt clearly in ${lang} using style: ${style}.
+      Doubt / Problem: "${promptText}"`;
+
+      executeBackendQuery(prompt, `AI Doubt Solver & Explanation`);
     }
 
     function summarizePaper() {
-      let text = document.getElementById('summaryText').value;
-      if (!text.trim() && summaryUploadedText) {
-        text = summaryUploadedText;
-      }
-      if (!text.trim()) {
-        alert("Please paste research text or upload a PDF file!");
+      const text = document.getElementById('summaryText').value.trim();
+      if (!text) {
+        alert('Please enter or upload research paper text to summarize.');
         return;
       }
 
-      const prompt = `Extract key insights, abstract, research methodology, findings, and conclusion from the following research text:\n\n${text.substring(0, 4000)}`;
-      executeBackendQuery(prompt, `Research Paper & PDF Summary`);
+      const prompt = `Analyze the following research paper text / academic abstract and provide a structured summary containing:
+      1. Core Objective & Problem Statement
+      2. Methodology Used
+      3. Key Findings & Results
+      4. Conclusion & Future Scope
+      
+      Text Content:
+      ${text.substring(0, 6000)}`;
+
+      executeBackendQuery(prompt, `Research Paper Summary & Insights`);
     }
 
     function generateCitation() {
       const style = document.getElementById('citationStyle').value;
       const type = document.getElementById('sourceType').value;
-      const details = document.getElementById('citationInput').value;
+      const details = document.getElementById('citationInput').value.trim();
 
-      if (!details.trim()) {
-        alert("Please enter source details!");
+      if (!details) {
+        alert('Please enter publication details.');
         return;
       }
 
-      const prompt = `Generate a perfectly formatted academic citation and reference in ${style} format for this ${type}: ${details}`;
-      executeBackendQuery(prompt, `Formatted Academic Citation (${style})`);
+      const prompt = `Generate a precisely formatted academic citation and bibliography reference in ${style} for a ${type} based on these details:
+      "${details}"`;
+
+      executeBackendQuery(prompt, `Formatted Citation (${style})`);
     }
 
     function loadMoreContent() {
       if (!lastPromptText) return;
-      executeBackendQuery(lastPromptText + " (Provide additional non-repeating advanced questions and detailed solutions)", "Additional Generated Questions & Solutions", true);
+      const prompt = lastPromptText + " (Provide additional advanced questions, deeper derivations, and comprehensive sub-topics continuing from the previous output)";
+      executeBackendQuery(prompt, document.getElementById('outputTitle').textContent + " (Extended)", true);
     }
 
     function copyOutput() {
       const text = document.getElementById('outputContent').innerText;
-      navigator.clipboard.writeText(text);
-      alert("Output copied to clipboard successfully!");
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Output copied to clipboard!');
+      });
     }
 
-    function printPDF() {
-      window.print();
-    }
-
-    // Focus Timer Logic
+    // FOCUS TIMER / POMODORO LOGIC
     let timerInterval = null;
     let timeLeft = 25 * 60;
     let isRunning = false;
@@ -786,45 +816,40 @@
     function updateTimerDisplay() {
       const minutes = Math.floor(timeLeft / 60);
       const seconds = timeLeft % 60;
-      document.getElementById('timerDisplay').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      document.getElementById('timerDisplay').textContent = 
+        String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+    }
+
+    function setTimerDuration(mins) {
+      pauseTimer();
+      timeLeft = mins * 60;
+      updateTimerDisplay();
+      document.getElementById('timerStatus').textContent = mins === 5 ? 'Break Time' : 'Focus Session';
     }
 
     function startTimer() {
       if (isRunning) return;
       isRunning = true;
-      document.getElementById('timerStatus').textContent = "Focus Session Active 🔥";
       timerInterval = setInterval(() => {
         if (timeLeft > 0) {
           timeLeft--;
           updateTimerDisplay();
         } else {
-          clearInterval(timerInterval);
-          isRunning = false;
-          alert("Focus session completed! Great job! 🎉");
+          pauseTimer();
+          alert('Focus session completed! Great job maintaining your learning streak!');
         }
       }, 1000);
     }
 
     function pauseTimer() {
-      clearInterval(timerInterval);
       isRunning = false;
-      document.getElementById('timerStatus').textContent = "Session Paused ⏸️";
+      clearInterval(timerInterval);
     }
 
     function resetTimer() {
-      clearInterval(timerInterval);
-      isRunning = false;
+      pauseTimer();
       timeLeft = 25 * 60;
       updateTimerDisplay();
-      document.getElementById('timerStatus').textContent = "Focus Session";
-    }
-
-    function setTimerDuration(mins) {
-      clearInterval(timerInterval);
-      isRunning = false;
-      timeLeft = mins * 60;
-      updateTimerDisplay();
-      document.getElementById('timerStatus').textContent = mins === 5 ? "Break Time ☕" : "Focus Session";
     }
   </script>
 </body>
